@@ -5,6 +5,7 @@ from .config import settings
 from pathlib import Path
 from .schemas import VideoCreate
 import shutil
+from .logging_config import logger
 
 S3_ACCESS_KEY_ID = os.getenv('S3_ACCESS_KEY_ID')
 S3_SECRET_ACCESS_KEY = os.getenv('S3_SECRET_ACCESS_KEY')
@@ -12,13 +13,7 @@ S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 LOCAL_STORAGE_DIR = os.getenv('LOCAL_STORAGE_DIR', './uploads')
 s3_enabled = False
 s3_client = None
-# s3_client = boto3.client(
-#     's3',
-#     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-#     aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-#     region_name=settings.AWS_REGION
-# )
-# Ensure local directory exists
+
 Path(LOCAL_STORAGE_DIR).mkdir(parents=True, exist_ok=True)
 
 # Try to initialize S3 client
@@ -43,8 +38,11 @@ def upload_to_s3(file, file_key):
             metadata = VideoCreate(filename=file.filename, file_size=os.path.getsize(file_location), upload_path=file_location)
             return {"message": "File uploaded locally", "metadata": metadata.model_dump_json()}
     
+        logger.info(f"Attempting to upload file {file.filename} to S3.")
+
         s3_client.upload_fileobj(file, S3_BUCKET_NAME, file_key)
-        metadata = VideoCreate(filename=file, file_size=0, upload_path=f"s3://{bucket_name}/{file_key}")
+        metadata = VideoCreate(filename=file, file_size=0, upload_path=f"s3://{S3_BUCKET_NAME}/{file_key}")
         return {"message": "File uploaded locally", "metadata": metadata.model_dump_json()}
     except NoCredentialsError:
+        logger.error(f"Failed to upload file {file.filename}: {str(e)}")
         raise Exception("Credentials not available.")

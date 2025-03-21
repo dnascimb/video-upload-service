@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile, Depends
 from sqlalchemy.orm import Session
 from . import crud, models, schemas, database, s3_service
 import os
+from .logging_config import logger
 from io import BytesIO
 from fastapi.responses import JSONResponse
 from botocore.exceptions import NoCredentialsError, EndpointConnectionError
@@ -28,6 +29,8 @@ async def upload_video(
         file_content = await file.read()
         file_size = len(file_content)
         file_key = f"{file.filename}"
+
+        logger.info(f"Received file upload request for: {file.filename}")
 
         # Upload file to S3
         upload = s3_service.upload_to_s3(BytesIO(file_content), file_key)
