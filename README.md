@@ -1,6 +1,6 @@
-Creating a FastAPI project that allows video uploads, stores them in an S3 bucket, and persists metadata in a database involves several components. Here's a step-by-step guide to building this project in a way that's scalable, efficient, and practical.
+A FastAPI project that allows video uploads, stores them in an S3 bucket, and persists metadata in a database. 
 
-### Prerequisites:
+### Technology:
 
 - **Python 3.8+** (ensure it's installed on your Mac)
 - **AWS S3** credentials (set up an S3 bucket)
@@ -34,25 +34,39 @@ video-upload-api/
 
 ### 1. Setting Up Dependencies
 
-Start by creating a `requirements.txt` for your project:
-
-```txt
-fastapi
-uvicorn
-boto3
-sqlalchemy
-psycopg2
-alembic
-pydantic
-python-dotenv
-python-multipart
-```
-
 To install dependencies, run:
 
 ```bash
 pip install -r requirements.txt
 ```
+
+### 2. Environment Variables (`.env`)
+
+Create a `.env` file in the root directory for your sensitive configurations like database URL and AWS credentials.
+
+```env
+DATABASE_URL=postgresql://user:password@db:5432/video_db
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+S3_BUCKET_NAME=your_bucket_name
+AWS_REGION=your_region
+```
+
+### 3. Running the App Locally
+
+You can now run the application locally using Docker:
+
+```bash
+docker-compose up
+```
+
+Visit `http://localhost:8000/docs` to see the FastAPI docs and test the video upload.
+
+### OVERVIEW
+
+### 1. `auth.py`: Authentication Module
+
+Placeholder for future authentication implementation.
 
 ### 2. `config.py`: Configuration for Environment Variables
 
@@ -285,27 +299,6 @@ COPY . .
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-### 10. Running the App Locally
-
-You can now run the application locally using Docker:
-
-```bash
-docker-compose up --build
-```
-
-Visit `http://localhost:8000/docs` to see the FastAPI docs and test the video upload.
-
-### 11. Environment Variables (`.env`)
-
-Create a `.env` file in the root directory for your sensitive configurations like database URL and AWS credentials.
-
-```env
-DATABASE_URL=postgresql://user:password@db:5432/video_db
-AWS_ACCESS_KEY_ID=your_aws_access_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-S3_BUCKET_NAME=your_bucket_name
-AWS_REGION=your_region
-```
 
 ### Scaling and AWS Setup
 
