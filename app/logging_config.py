@@ -1,22 +1,28 @@
-import os
 import logging
+import os
 
-# Environment-based configuration (e.g., local or production)
-env = os.getenv("ENVIRONMENT", "development")  # 'development' or 'production'
+# Get the log file path from environment variable or set default
+log_file = os.getenv("LOG_FILE", "app.log")
 
-# Log file location and logging level configuration
-LOG_FILE = "app.log" if env == "development" else None
-LOG_LEVEL = logging.INFO if env == "development" else logging.WARNING
+# Create logger
+logger = logging.getLogger("app_logger")
+logger.setLevel(logging.INFO)
 
-# Configure the logger
-logging.basicConfig(
-    level=LOG_LEVEL,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_FILE) if env == "development" else logging.StreamHandler(),  # Log to file or console
-    ]
-)
+# Create handlers
+file_handler = logging.FileHandler(log_file)
+file_handler.setLevel(logging.INFO)
 
-# Create and export the logger
-logger = logging.getLogger()
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
 
+# Create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# Add handlers to the logger
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
+# Example: Log to verify it works
+logger.info("Logger is set up.")

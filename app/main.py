@@ -25,12 +25,11 @@ async def upload_video(
     file: UploadFile = File(...), db: Session = Depends(get_db)
 ):
     try:
+        logger.info(f"Received file upload request for: {file}")
         # Read the file and get its size
         file_content = await file.read()
         file_size = len(file_content)
         file_key = f"{file.filename}"
-
-        logger.info(f"Received file upload request for: {file.filename}")
 
         # Upload file to S3
         upload = s3_service.upload_to_s3(BytesIO(file_content), file_key)
@@ -48,3 +47,12 @@ async def get_video(video_id: int, db: Session = Depends(get_db)):
     if video is None:
         return JSONResponse(status_code=404, content={"message": "Video not found"})
     return video
+
+@app.get("/status")
+async def get_status():
+    try:
+        logger.info(f"** STATUS CHECK ** OK ;)")
+        return {"status": "ok"}
+    except Exception as e:
+        # Handle any unexpected errors
+        return JSONResponse(status_code=500, content={"message": str(e)})
